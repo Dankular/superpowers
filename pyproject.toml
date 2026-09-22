@@ -1,0 +1,26 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "superpowers-router"
+version = "0.1.0"
+description = "Adaptive model routing layer for this Superpowers fork (see docs/router/spec.md). Fork-specific: not part of upstream obra/superpowers."
+requires-python = ">=3.10"
+dependencies = [
+    "pyyaml>=6.0",
+]
+
+[project.optional-dependencies]
+# Laya is a real, heavy ML dependency (torch, transformers, safetensors,
+# huggingface_hub) -- verified against laya 0.3.5's own METADATA. It must
+# stay optional: this repo's core plugin is zero-dependency by policy
+# (AGENTS.md), and most Superpowers users will never enable adaptive routing.
+routing = ["laya>=0.3"]
+dev = ["pytest>=7.0"]
+
+[tool.setuptools]
+packages = ["router"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests/router"]

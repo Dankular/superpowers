@@ -1,0 +1,66 @@
+# Logical tier -> concrete provider/model mapping.
+#
+# NOT YET CONSUMED BY CODE: the model broker (router/broker.py,
+# router/providers.py) that would read this file is a later phase (see
+# docs/router/spec.md section 11). This file documents the intended shape
+# so routing.example.yaml's tier names have somewhere to resolve to once
+# the broker exists. Tier names here MUST match router/policy.py's TIERS list.
+#
+# Copy this file (e.g. to models.yaml) and fill in real models before the
+# broker is built; this example is committed with no secrets, per policy.
+
+tiers:
+  local_small:
+    rank: 0
+    providers:
+      - provider: openai_compatible
+        model: local-small
+        base_url: ${LOCAL_MODEL_BASE_URL:-http://127.0.0.1:8080/v1}
+        api_key_env: LOCAL_MODEL_API_KEY
+        enabled: true
+        priority: 10
+
+  free_small:
+    rank: 1
+    providers:
+      - provider: openrouter
+        model: example/free-small
+        api_key_env: OPENROUTER_API_KEY
+        enabled: true
+        priority: 10
+
+  free_strong:
+    rank: 2
+    providers:
+      - provider: openrouter
+        model: example/free-coder
+        api_key_env: OPENROUTER_API_KEY
+        enabled: true
+        priority: 10
+
+  economy:
+    rank: 3
+    providers:
+      - provider: openai_compatible
+        model: economy-coder
+        api_key_env: ECONOMY_API_KEY
+        enabled: false
+        priority: 10
+
+  frontier:
+    rank: 4
+    providers:
+      - provider: openai
+        model: ${FRONTIER_MODEL}
+        api_key_env: OPENAI_API_KEY
+        enabled: true
+        priority: 10
+
+  frontier_reasoning:
+    rank: 5
+    providers:
+      - provider: openai
+        model: ${FRONTIER_REASONING_MODEL}
+        api_key_env: OPENAI_API_KEY
+        enabled: true
+        priority: 10

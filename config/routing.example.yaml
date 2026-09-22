@@ -1,0 +1,47 @@
+# Superpowers adaptive router configuration.
+#
+# Phase status (see docs/model-routing.md): schemas, config loading, the
+# deterministic policy engine, and the Laya/deterministic-fallback
+# classifier are implemented. The model broker, SDD dispatch integration,
+# escalation execution, and telemetry described in docs/router/spec.md are
+# NOT yet built -- `scripts/route-task --dry-run` only ever prints a tier
+# decision, it never dispatches a worker.
+#
+# Copy this file (e.g. to routing.yaml) and adjust before enabling routing
+# for real; this example is committed with no secrets, per policy.
+
+routing:
+  enabled: true
+  classifier: laya   # or "deterministic" to always skip Laya
+
+  default_tier: free_strong
+  final_review_min_tier: frontier   # not yet auto-enforced; set
+                                     # metadata.final_review: true on the
+                                     # TaskEnvelope for a final-review dispatch
+
+  confidence:
+    low: 0.58
+    high: 0.82
+    default_uncertain_tier: free_strong
+
+  speculative_downgrade:
+    enabled: true
+    max_levels: 1
+    requires_strong_verification: true
+
+  # Hard floors: minimum tier for a task matching each signal. Only
+  # structural/explicit signals trigger these (see router/policy.py's
+  # structural_floor) -- security_review and concurrency_review require an
+  # explicit TaskEnvelope.metadata flag, never text-sniffing.
+  floors:
+    architecture: frontier
+    final_review: frontier
+    security_review: frontier
+    concurrency_review: frontier
+    multi_file_implementation: free_strong
+    nontrivial_review: free_strong
+    unknown_cause_debugging: free_strong
+
+repository_policy:
+  local_only: false
+  max_tier: frontier_reasoning
